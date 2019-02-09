@@ -4,6 +4,8 @@
 #include "idxfile.h"
 #include "imgfile.h"
 
+#include "mathutils.h"
+
 int main(int argc, char const *argv[])
 {
     imgfile* trainImages = new imgfile("data/train-images.idx3-ubyte");
