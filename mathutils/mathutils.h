@@ -50,6 +50,9 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Matrix& mat);
 };
 
+/**
+ * Custom exception class for error handling.
+ */
 class MathException
 {
     const char* msg;

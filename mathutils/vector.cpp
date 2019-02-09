@@ -46,6 +46,9 @@ const bool Vector::isVertical() const
     return this->vertical;
 }
 
+/**
+ * Get the n-th element of the element vector.
+ */
 const double& Vector::operator[](size_t pos) const
 {
     return this->elems[pos];

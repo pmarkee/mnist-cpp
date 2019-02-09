@@ -60,6 +60,9 @@ const elementMatrix& Matrix::getElems() const
     return this->elems;
 }
 
+/**
+ * Get the n-th row of the element matrix.
+ */
 const elementVector& Matrix::operator[](size_t row) const
 {
     return this->elems[row];
