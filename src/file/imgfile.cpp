@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include "imgfile.h"
+#include "idxfile.h"
 
 imgfile::imgfile(const char* path) :
     idxfile(path)

@@ -2,8 +2,6 @@
 #include <cassert>
 
 #include "idxfile.h"
-#include "imgfile.h"
-
 #include "mathutils.h"
 
 int main(int argc, char const *argv[])

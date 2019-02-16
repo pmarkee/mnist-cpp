@@ -23,4 +23,13 @@ public:
     uint8_t* dataAt(size_t pos) const;
 };
 
+class imgfile : public idxfile
+{
+public:
+    imgfile(const char* path);
+    ~imgfile();
+
+    void dump(size_t pos) const;
+};
+
 #endif /* IDXFILE_H */

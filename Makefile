@@ -1,16 +1,22 @@
-CPP=g++
-COMMON_OPTS=-I. -Ifile -Imathutils -o main
-COMMON_FILES=main.cpp \
-			 file/idxfile.cpp \
-			 file/imgfile.cpp \
-			 mathutils/matrix.cpp \
-			 mathutils/vector.cpp \
-			 mathutils/math_exception.cpp
+INCLUDE_DIR=include
+HEADERS=$(wildcard $(INCLUDE_DIR)/*.h)
 
-BASE_CMD=${CPP} ${COMMON_OPTS} ${COMMON_FILES}
+SRC_DIR=src
+IMPL_DIRS=$(wildcard $(SRC_DIR)/*)
+
+CXX=g++
+CXXFLAGS=-I$(INCLUDE_DIR)
+
+FILES=main.cpp
+FILES+=$(foreach dir,$(IMPL_DIRS),$(wildcard $(dir)/*.cpp))
+
+BASE_CMD=$(CXX) $(CXXFLAGS) $(FILES)
 
 all:
-	${BASE_CMD}
+	$(BASE_CMD) -o main
 
 debug:
-	${BASE_CMD} -g -DDEBUG
+	$(BASE_CMD) -o main -g -DDEBUG
+
+print:
+	@echo $(HEADERS)
