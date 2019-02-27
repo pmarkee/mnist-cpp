@@ -12,6 +12,7 @@ class Network {
     LayerVector layers;
     std::vector<mathutils::Matrix> weightMatrices;
     std::vector<mathutils::Vector> biases;
+    size_t iterations;
     // TODO activation function?
     // TODO activation function derivative?
 public:
@@ -21,6 +22,10 @@ public:
             const std::vector<mathutils::Vector>& biases);
 
     ~Network();
+
+    void nextIteration();
+    void computeNewValues();
+    void backpropagate();
 
     void info();
 };

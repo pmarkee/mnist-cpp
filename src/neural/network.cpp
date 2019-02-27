@@ -9,6 +9,7 @@
 #define RANDOM_VALUE ((double)rand() / RAND_MAX)
 
 Network::Network(const size_t layerCount, const size_t* layerSizes)
+    : iterations(0)
 {
     if (layerCount < 2) {
         throw NeuralException("Invalid layer count");
@@ -68,6 +69,7 @@ Network::Network(const LayerVector& layers,
     : layers(layers)
     , weightMatrices(weightMatrices)
     , biases(biases)
+    , iterations(0)
 {
 }
 
@@ -113,4 +115,27 @@ void Network::info()
     {
         std::cout << *i << "\n";
     }
+}
+
+void Network::nextIteration()
+{
+    this->computeNewValues();
+    // this->backpropagate();
+}
+
+void Network::computeNewValues()
+{
+    return;
+    for (int i = 0; i < this->layers.size() - 1; ++i)
+    {
+        // TODO activation function!
+        // TODO this assignment will not be good (vector<double> = mathutils::Vector)
+        // this->layers[i + 1] = this->weightMatrices[i] * this->layers[i] + this->biases[i];
+    }
+}
+
+void Network::backpropagate()
+{
+    // TODO
+    throw NeuralException("Backpropagation not yet implemented");
 }
