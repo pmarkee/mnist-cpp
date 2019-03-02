@@ -9,14 +9,18 @@ class Network {
     std::vector<mathutils::Vector> layers;
     std::vector<mathutils::Matrix> weightMatrices;
     std::vector<mathutils::Vector> biases;
-    size_t iterations;
-    // TODO activation function?
-    // TODO activation function derivative?
+    mathutils::activationFunction act; // TODO derivative?
+    size_t iterations; // TODO actually use this
 public:
-    Network(const size_t layerCount, const size_t* layerSizes);
+    Network(const size_t layerCount,
+            const size_t* layerSizes,
+            mathutils::activationFunction act = &mathutils::sigmoid);
+
     Network(const std::vector<mathutils::Vector>& layers,
             const std::vector<mathutils::Matrix>& weightMatrices,
-            const std::vector<mathutils::Vector>& biases);
+            const std::vector<mathutils::Vector>& biases,
+            mathutils::activationFunction act = &mathutils::sigmoid,
+            const size_t iterations = 0);
 
     ~Network();
 

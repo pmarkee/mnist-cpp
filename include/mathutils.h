@@ -9,6 +9,10 @@ namespace mathutils {
 typedef std::vector<double> Vector;
 typedef std::vector<Vector> Matrix;
 
+typedef Vector (*activationFunction)(Vector);
+
+Vector sigmoid(Vector z);
+
 /**
  * Custom exception class for error handling.
  */
@@ -25,8 +29,11 @@ public:
 } /* namespace mathutils */
 
 const mathutils::Vector operator+(const mathutils::Vector& op1, const mathutils::Vector& op2);
-const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec);
+const mathutils::Vector operator-(const mathutils::Vector& vec);
+const mathutils::Vector operator-(const mathutils::Vector& op1, const mathutils::Vector& op2);
 std::ostream& operator<<(std::ostream& os, const mathutils::Vector& vec);
+
+const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec);
 std::ostream& operator<<(std::ostream& os, const mathutils::Matrix& mat);
 
 #endif /* MATHUTILS_H */

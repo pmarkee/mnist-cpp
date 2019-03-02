@@ -29,6 +29,9 @@ int main(int argc, char const *argv[])
     size_t layerSizes[3] = {4,3,2};
     Network net(3, layerSizes);
     net.info();
+
+    net.nextIteration();
+    net.info();
 #endif
 
     return 0;

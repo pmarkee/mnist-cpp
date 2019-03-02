@@ -5,7 +5,7 @@ SRC_DIR=src
 IMPL_DIRS=$(wildcard $(SRC_DIR)/*)
 
 CXX=g++
-CXXFLAGS=-I$(INCLUDE_DIR)
+CXXFLAGS=-I$(INCLUDE_DIR) -std=c++11 -lm
 
 FILES=main.cpp
 FILES+=$(foreach dir,$(IMPL_DIRS),$(wildcard $(dir)/*.cpp))

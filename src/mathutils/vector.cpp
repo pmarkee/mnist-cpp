@@ -16,6 +16,23 @@ const mathutils::Vector operator+(const mathutils::Vector& op1, const mathutils:
     return ret;
 }
 
+const mathutils::Vector operator-(const mathutils::Vector& vec)
+{
+    mathutils::Vector ret;
+
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        ret.push_back(-vec[i]);
+    }
+    return ret;
+}
+
+const mathutils::Vector operator-(const mathutils::Vector& op1, const mathutils::Vector& op2)
+{
+    mathutils::Vector ret;
+    return op1 + (-op2);
+}
+
 std::ostream& operator<<(std::ostream& os, const mathutils::Vector& vec)
 {
     for (int i = 0; i < vec.size(); ++i)

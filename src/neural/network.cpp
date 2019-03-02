@@ -6,10 +6,13 @@
 #include "mathutils.h"
 #include "neural.h"
 
-#define RANDOM_VALUE ((double)rand() / RAND_MAX)
+#define RANDOM_VALUE(divider) ((double)rand() / (RAND_MAX * (divider)))
 
-Network::Network(const size_t layerCount, const size_t* layerSizes)
+Network::Network(const size_t layerCount,
+                 const size_t* layerSizes,
+                 mathutils::activationFunction act)
     : iterations(0)
+    , act(act)
 {
     if (layerCount < 2) {
         throw NeuralException("Invalid layer count");
@@ -26,7 +29,7 @@ Network::Network(const size_t layerCount, const size_t* layerSizes)
         mathutils::Vector actLayer;
         for (int j = 0; j < layerSizes[i]; ++j)
         {
-            actLayer.push_back(RANDOM_VALUE);
+            actLayer.push_back(RANDOM_VALUE(1));
         }
         this->layers.push_back(actLayer);
     }
@@ -43,7 +46,7 @@ Network::Network(const size_t layerCount, const size_t* layerSizes)
             mathutils::Vector vec;
             for (int j = 0; j < cols; ++j)
             {
-                vec.push_back(RANDOM_VALUE);
+                vec.push_back(RANDOM_VALUE(1));
             }
             mat.push_back(vec);
         }
@@ -57,7 +60,7 @@ Network::Network(const size_t layerCount, const size_t* layerSizes)
         mathutils::Vector vec;
         for (int j = 0; j < this->layers[i+1].size(); ++j)
         {
-            vec.push_back(RANDOM_VALUE);
+            vec.push_back(RANDOM_VALUE(0.1));
         }
         this->biases.push_back(vec);
     }
@@ -65,11 +68,14 @@ Network::Network(const size_t layerCount, const size_t* layerSizes)
 
 Network::Network(const std::vector<mathutils::Vector>& layers,
                  const std::vector<mathutils::Matrix>& weightMatrices,
-                 const std::vector<mathutils::Vector>& biases)
+                 const std::vector<mathutils::Vector>& biases,
+                 mathutils::activationFunction act,
+                 const size_t iterations)
     : layers(layers)
     , weightMatrices(weightMatrices)
     , biases(biases)
-    , iterations(0)
+    , act(act)
+    , iterations(iterations)
 {
 }
 
@@ -85,12 +91,9 @@ void Network::nextIteration()
 
 void Network::computeNewValues()
 {
-    return;
     for (int i = 0; i < this->layers.size() - 1; ++i)
     {
-        // TODO activation function!
-        // TODO this assignment will not be good (vector<double> = mathutils::Vector)
-        // this->layers[i + 1] = this->weightMatrices[i] * this->layers[i] + this->biases[i];
+        this->layers[i + 1] = (*this->act)(this->weightMatrices[i] * this->layers[i] - this->biases[i]);
     }
 }
 
