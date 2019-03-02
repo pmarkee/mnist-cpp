@@ -23,7 +23,7 @@ Network::Network(const size_t layerCount, const size_t* layerSizes)
             throw NeuralException("Invalid layer size");
         }
 
-        Layer actLayer;
+        mathutils::Vector actLayer;
         for (int j = 0; j < layerSizes[i]; ++j)
         {
             actLayer.push_back(RANDOM_VALUE);
@@ -37,10 +37,10 @@ Network::Network(const size_t layerCount, const size_t* layerSizes)
         size_t rows = this->layers[i+1].size();
         size_t cols = this->layers[i].size();
 
-        mathutils::elementMatrix mat;
+        mathutils::Matrix mat;
         for (int i = 0; i < rows; ++i)
         {
-            mathutils::elementVector vec;
+            mathutils::Vector vec;
             for (int j = 0; j < cols; ++j)
             {
                 vec.push_back(RANDOM_VALUE);
@@ -48,22 +48,22 @@ Network::Network(const size_t layerCount, const size_t* layerSizes)
             mat.push_back(vec);
         }
 
-        this->weightMatrices.push_back(mathutils::Matrix(mat));
+        this->weightMatrices.push_back(mat);
     }
 
     // Random bias vectors
     for (int i = 0; i < layerCount - 1; ++i)
     {
-        mathutils::elementVector vec;
+        mathutils::Vector vec;
         for (int j = 0; j < this->layers[i+1].size(); ++j)
         {
             vec.push_back(RANDOM_VALUE);
         }
-        this->biases.push_back(mathutils::Vector(vec, true));
+        this->biases.push_back(vec);
     }
 }
 
-Network::Network(const LayerVector& layers,
+Network::Network(const std::vector<mathutils::Vector>& layers,
                  const std::vector<mathutils::Matrix>& weightMatrices,
                  const std::vector<mathutils::Vector>& biases)
     : layers(layers)
@@ -75,46 +75,6 @@ Network::Network(const LayerVector& layers,
 
 Network::~Network()
 {
-}
-
-void Network::info()
-{
-    std::cout << "----------------------\n";
-    std::cout << "INFO: Network @ " << this << "\n"; 
-    std::cout << "Layer count: " << this->layers.size() << "\n";
-    
-    std::cout << "Layer sizes: ";
-    for (LayerVector::iterator i = this->layers.begin(); i != this->layers.end(); ++i)
-    {
-        std::cout << i->size() << " ";
-    } 
-    std::cout << "\n";
-
-    std::cout << "Layers:\n";
-    for(LayerVector::iterator i = this->layers.begin(); i != this->layers.end(); ++i)
-    {
-        for (Layer::iterator j = i->begin(); j != i->end(); ++j)
-        {
-            std::cout << *j << " ";
-        }
-        std::cout << "\n";
-    }
-
-    std::cout << "\nWeight matrices:\n";
-    for (std::vector<mathutils::Matrix>::iterator i = this->weightMatrices.begin();
-         i != this->weightMatrices.end();
-         ++i)
-    {
-        std::cout << *i << "\n";
-    }
-
-    std::cout << "Bias vectors:\n";
-    for (std::vector<mathutils::Vector>::iterator i = this->biases.begin();
-         i != this->biases.end();
-         ++i)
-    {
-        std::cout << *i << "\n";
-    }
 }
 
 void Network::nextIteration()
@@ -138,4 +98,43 @@ void Network::backpropagate()
 {
     // TODO
     throw NeuralException("Backpropagation not yet implemented");
+}
+
+void Network::info()
+{
+    std::cout << "----------------------\n";
+    std::cout << "INFO: Network @ " << this << "\n"; 
+    std::cout << "Layer count: " << this->layers.size() << "\n";
+    
+    std::cout << "Layer sizes: ";
+    for (std::vector<mathutils::Vector>::iterator i = this->layers.begin(); i != this->layers.end(); ++i)
+    {
+        std::cout << i->size() << " ";
+    } 
+    std::cout << "\n";
+
+    std::cout << "Layers:\n";
+    for(std::vector<mathutils::Vector>::iterator i = this->layers.begin(); i != this->layers.end(); ++i)
+    {
+        std::cout << *i;
+        std::cout << "\n";
+    }
+
+    std::cout << "\nWeight matrices:\n";
+    for (std::vector<mathutils::Matrix>::iterator i = this->weightMatrices.begin();
+         i != this->weightMatrices.end();
+         ++i)
+    {
+        std::cout << *i;
+        std::cout << "\n";
+    }
+
+    std::cout << "Bias vectors:\n";
+    for (std::vector<mathutils::Vector>::iterator i = this->biases.begin();
+         i != this->biases.end();
+         ++i)
+    {
+        std::cout << *i;
+        std::cout << "\n";
+    }
 }

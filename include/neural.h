@@ -5,11 +5,8 @@
 
 #include "mathutils.h"
 
-typedef std::vector<double> Layer;
-typedef std::vector<Layer> LayerVector;
-
 class Network {
-    LayerVector layers;
+    std::vector<mathutils::Vector> layers;
     std::vector<mathutils::Matrix> weightMatrices;
     std::vector<mathutils::Vector> biases;
     size_t iterations;
@@ -17,7 +14,7 @@ class Network {
     // TODO activation function derivative?
 public:
     Network(const size_t layerCount, const size_t* layerSizes);
-    Network(const LayerVector& layers,
+    Network(const std::vector<mathutils::Vector>& layers,
             const std::vector<mathutils::Matrix>& weightMatrices,
             const std::vector<mathutils::Vector>& biases);
 
