@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 namespace mathutils {
 
@@ -12,6 +13,10 @@ typedef std::vector<Vector> Matrix;
 typedef Vector (*activationFunction)(Vector);
 
 Vector sigmoid(Vector z);
+inline double diffSquare(double a, double b)
+{
+    return pow(a - b, 2);
+}
 
 /**
  * Custom exception class for error handling.

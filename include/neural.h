@@ -24,9 +24,10 @@ public:
 
     ~Network();
 
-    void nextIteration();
+    void nextIteration(const mathutils::Vector& expected);
     void computeNewValues();
-    void backpropagate();
+    double computeCost(const mathutils::Vector& expected);
+    void backpropagate(double cost);
 
     void info();
 };

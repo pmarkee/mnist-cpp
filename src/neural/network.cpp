@@ -83,21 +83,38 @@ Network::~Network()
 {
 }
 
-void Network::nextIteration()
+void Network::nextIteration(const mathutils::Vector& expected)
 {
     this->computeNewValues();
-    // this->backpropagate();
+    double cost = this->computeCost(expected);
+    std::cout << cost << "\n";
+    // this->backpropagate(cost);
+}
+
+double Network::computeCost(const mathutils::Vector& expected)
+{
+    mathutils::Vector actual = this->layers.back();
+    // The actual and expected output layer have to be the same size.
+    if (expected.size() != actual.size()) {
+        throw NeuralException("Actual and expected output layer differ in length");
+    }
+
+    double sum = 0;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        sum += mathutils::diffSquare(actual[i], expected[i]);
+    }
+    return sum;
 }
 
 void Network::computeNewValues()
 {
     for (int i = 0; i < this->layers.size() - 1; ++i)
     {
-        this->layers[i + 1] = (*this->act)(this->weightMatrices[i] * this->layers[i] - this->biases[i]);
+        this->layers[i + 1] = (*this->act)((this->weightMatrices[i] * this->layers[i] - this->biases[i]));
     }
 }
 
-void Network::backpropagate()
+void Network::backpropagate(double cost)
 {
     // TODO
     throw NeuralException("Backpropagation not yet implemented");

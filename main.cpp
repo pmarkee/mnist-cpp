@@ -19,20 +19,20 @@ int main(int argc, char const *argv[])
 #ifdef DEBUG
     trainImages->info();
     trainLabels->info();
-    trainImages->dump(3254);
+    trainImages->dump(0);
 #endif /* DEBUG */
 
     delete trainImages;
     delete trainLabels;
 
 #ifdef DEBUG
-    size_t layerSizes[3] = {4,3,2};
-    Network net(3, layerSizes);
-    net.info();
+    size_t layerSizes[2] = {400, 10};
+    Network net(2, layerSizes);
+    // net.info();
 
-    net.nextIteration();
-    net.info();
-#endif
+    net.nextIteration(expected);
+    // net.info();
+#endif /* DEBUG */
 
     return 0;
 }
