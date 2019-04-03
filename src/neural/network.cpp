@@ -1,52 +1,56 @@
 #include <iostream>
 #include <cstdlib>
-#include <ctime>
+#include <random>
 #include <vector>
 
 #include "mathutils.h"
 #include "neural.h"
 
-#define RANDOM_VALUE(divider) ((double)rand() / (RAND_MAX * (divider)))
-
-Network::Network(const size_t layerCount,
-                 const size_t* layerSizes,
+Network::Network(const std::vector<size_t>& layerSizes,
                  mathutils::activationFunction act)
-    : iterations(0)
+    : layerSizes(layerSizes)
+    , iterations(0)
     , act(act)
 {
-    if (layerCount < 2) {
+    if (layerSizes.size() < 2) {
         throw NeuralException("Invalid layer count");
     }
 
     // Layers with random activation neurons
-    for (int i = 0; i < layerCount; ++i)
+    for (int i = 0; i < layerSizes[i]; ++i)
     {
-        if (layerSizes[i] <= 0)
+        if ((int64_t)layerSizes[i] <= 0)
         {
-            throw NeuralException("Invalid layer size");
+            // TODO give some warning here?
+            // If a negative value is passed by accident, that will be a very large
+            // number when handled as size_t.
         }
 
         mathutils::Vector actLayer;
         for (int j = 0; j < layerSizes[i]; ++j)
         {
-            actLayer.push_back(RANDOM_VALUE(1));
+            actLayer.push_back(0);
         }
         this->layers.push_back(actLayer);
     }
 
-    // Random weight matrices
-    for (int i = 0; i < layerCount - 1; ++i)
-    {
-        size_t rows = this->layers[i+1].size();
-        size_t cols = this->layers[i].size();
+    std::default_random_engine generator;
 
+    // Random weight matrices
+    for (int i = 0; i < layerSizes.size() - 1; ++i)
+    {
+        size_t rows = this->layerSizes[i+1];
+        size_t cols = this->layerSizes[i];
+
+        std::uniform_real_distribution<double> distribution(-1, 1);
         mathutils::Matrix mat;
         for (int i = 0; i < rows; ++i)
         {
             mathutils::Vector vec;
             for (int j = 0; j < cols; ++j)
             {
-                vec.push_back(RANDOM_VALUE(1));
+                // NOTE: this is only pseudo-random.
+                vec.push_back(distribution(generator));
             }
             mat.push_back(vec);
         }
@@ -55,36 +59,44 @@ Network::Network(const size_t layerCount,
     }
 
     // Random bias vectors
-    for (int i = 0; i < layerCount - 1; ++i)
+    for (int i = 0; i < layerSizes.size() - 1; ++i)
     {
+        std::uniform_real_distribution<double> distribution(-10, 10);
         mathutils::Vector vec;
-        for (int j = 0; j < this->layers[i+1].size(); ++j)
+        for (int j = 0; j < this->layerSizes[i+1]; ++j)
         {
-            vec.push_back(RANDOM_VALUE(0.1));
+            // NOTE: this is only pseudo-random.
+            vec.push_back(distribution(generator));
         }
         this->biases.push_back(vec);
     }
 }
 
-Network::Network(const std::vector<mathutils::Vector>& layers,
-                 const std::vector<mathutils::Matrix>& weightMatrices,
+Network::Network(const std::vector<mathutils::Matrix>& weightMatrices,
                  const std::vector<mathutils::Vector>& biases,
                  mathutils::activationFunction act,
                  const size_t iterations)
-    : layers(layers)
-    , weightMatrices(weightMatrices)
+    : weightMatrices(weightMatrices)
     , biases(biases)
     , act(act)
     , iterations(iterations)
 {
+    for (std::vector<mathutils::Vector>::iterator i = layers.begin(); i != layers.end(); ++i)
+    {
+        this->layerSizes.push_back(i->size());
+    }
 }
 
 Network::~Network()
 {
 }
 
-void Network::nextIteration(const mathutils::Vector& expected)
+void Network::nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected)
 {
+    if (this->layerSizes[0] != inputLayer.size()) {
+        throw NeuralException("Invalid input layer size");
+    }
+    this->layers[0] = inputLayer;
     this->computeNewValues();
     double cost = this->computeCost(expected);
     std::cout << cost << "\n";
