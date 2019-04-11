@@ -2,12 +2,58 @@
 
 #include "mathutils.h"
 
+const mathutils::Matrix operator+(const mathutils::Matrix& op1, const mathutils::Matrix& op2)
+{
+    mathutils::Matrix ret;
+    if (op1.size() != op2.size()) {
+        throw mathutils::MathException("Invalid size of operands");
+    }
+
+    for (int i = 0; i < op1.size(); ++i)
+    {
+        ret.push_back(op1[i] + op2[i]);
+    }
+
+    return ret;
+}
+
+const mathutils::Matrix operator-(const mathutils::Matrix& op1, const mathutils::Matrix& op2)
+{
+    mathutils::Matrix ret;
+    if (op1.size() != op2.size()) {
+        throw mathutils::MathException("Invalid size of operands");
+    }
+
+    for (int i = 0; i < op1.size(); ++i)
+    {
+        ret.push_back(op1[i] - op2[i]);
+    }
+
+    return ret;
+}
+
+const mathutils::Matrix schurProduct(const mathutils::Matrix& mat, const mathutils::Vector& vec)
+{
+    mathutils::Matrix ret;
+    // Comparing number of rows since this is a Schur product.
+    if (mat.size() != vec.size()) {
+        throw mathutils::MathException("Invalid size of operands");
+    }
+
+    for (int i = 0; i < mat.size(); i++) {
+        // use mathutils::Vector operator*(mathutils::Vector, double)
+        ret.push_back(mat[i] * vec[i]);
+    }
+
+    return ret;
+}
+
 const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec)
 {
     mathutils::Vector ret;
     if (mat[0].size() != vec.size())
     {
-        return ret;
+        throw mathutils::MathException("Invalid size of operands");
     }
     for (int i = 0; i < mat.size(); ++i)
     {
@@ -17,6 +63,37 @@ const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils:
             sum += mat[i][j] * vec[j];
         }
         ret.push_back(sum);
+    }
+    return ret;
+}
+
+const mathutils::Matrix operator*(const mathutils::Matrix& op1, const mathutils::Matrix& op2)
+{
+    mathutils::Matrix ret;
+    if (op1[0].size() != op2.size()) {
+        throw mathutils::MathException("Invalid size of operands");
+    }
+
+    for (int i = 0; i < op1.size(); i++) {
+        mathutils::Vector vec;
+        for (int j = 0; j < op2[0].size(); j++) {
+            double sum = 0;
+            for (int k = 0; k < op2.size(); k++) {
+                sum += op1[i][k] * op2[k][j];
+            }
+            vec.push_back(sum);
+        }
+        ret.push_back(vec);
+    }
+    return ret;
+}
+
+const mathutils::Matrix operator/(const mathutils::Matrix& mat, const size_t div)
+{
+    mathutils::Matrix ret;
+    for (int i = 0; i < mat.size(); ++i)
+    {
+        ret.push_back(mat[i] / div);
     }
     return ret;
 }
