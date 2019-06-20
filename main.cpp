@@ -21,8 +21,6 @@ int main(int argc, char const *argv[])
 
     std::vector<size_t> layerSizes;
     layerSizes.push_back(trainImages->elemSize());
-    layerSizes.push_back(300);
-    layerSizes.push_back(100);
     layerSizes.push_back(10);
     Network net(layerSizes);
 
@@ -42,6 +40,7 @@ int main(int argc, char const *argv[])
         }
 
         net.nextIteration(inputLayer, expected);
+        net.finalize();
     }
 #endif /* DEBUG */
 
