@@ -6,6 +6,7 @@
 #include "idxfile.h"
 #include "mathutils.h"
 #include "neural.h"
+#include "networkfile.h"
 
 int main(int argc, char const *argv[])
 {
@@ -15,9 +16,9 @@ int main(int argc, char const *argv[])
     assert(trainImages->itemCount() == trainLabels->itemCount());
 
 #ifdef DEBUG
-    trainImages->info();
-    trainLabels->info();
-    trainImages->dump(0);
+    //trainImages->info();
+    //trainLabels->info();
+    //trainImages->dump(0);
 
     std::vector<size_t> layerSizes;
     layerSizes.push_back(trainImages->elemSize());
@@ -41,6 +42,19 @@ int main(int argc, char const *argv[])
 
         net.nextIteration(inputLayer, expected);
         net.finalize();
+    }
+
+    /*std::ios_base::openmode mode = std::ios::out | std::ios::binary;
+    std::fstream stream("./net", mode);
+    NetworkFile file(&stream, mode, net);
+    file.doWrite();*/
+    std::ios_base::openmode mode = std::ios::in | std::ios::binary;
+    std::fstream stream("./net", mode);
+    NetworkFile file(&stream, mode);
+    try {
+        file.doRead();
+    } catch (NetworkFileError& err) {
+        std::cout << "shit hit the fan\n";
     }
 #endif /* DEBUG */
 

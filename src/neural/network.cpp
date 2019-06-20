@@ -6,6 +6,14 @@
 
 #include "mathutils.h"
 #include "neural.h"
+#include "networkfile.h"
+
+Network::Network(const NetworkFile& file)
+    : layerSizes(file.getLayerSizes())
+    , weightMatrices(file.getWMatrix())
+    , biases(file.getBVector())
+{
+}
 
 Network::Network(const std::vector<size_t>& layerSizes,
                  mathutils::activationFunction& act)
@@ -107,39 +115,43 @@ Network::~Network()
 {
 }
 
-std::vector<mathutils::Vector> Network::getLayers() {
+std::vector<size_t> Network::getLayerSizes() const {
+    return this->layerSizes;
+}
+
+std::vector<mathutils::Vector> Network::getLayers() const {
     return this->layers;
 }
 
-std::vector<mathutils::Vector> Network::getNonSigmoidLayers() {
+std::vector<mathutils::Vector> Network::getNonSigmoidLayers() const {
     return this->nonSigmoidLayers;
 }
 
-mathutils::Vector Network::getExpected() {
+mathutils::Vector Network::getExpected() const {
     return this->expected;
 }
 
-mathutils::Matrix Network::getDeltaA() {
+mathutils::Matrix Network::getDeltaA() const {
     return this->deltaA;
 }
 
-std::vector<mathutils::Matrix> Network::getWeights() {
+std::vector<mathutils::Matrix> Network::getWeights() const {
     return this->weightMatrices;
 }
 
-std::vector<mathutils::Vector> Network::getBiases() {
+std::vector<mathutils::Vector> Network::getBiases() const {
     return this->biases;
 }
 
-mathutils::vectorFunction Network::getActivationFunction() {
+mathutils::vectorFunction Network::getActivationFunction() const {
     return this->act.first;
 }
 
-mathutils::numericFunction Network::getActivationFunctionDerivative() {
+mathutils::numericFunction Network::getActivationFunctionDerivative() const {
     return this->act.second;
 }
 
-size_t Network::layerCount() {
+size_t Network::layerCount() const {
     return this->layers.size();
 }
 
@@ -228,14 +240,14 @@ void Network::finalize()
 void Network::info()
 {
     std::cout << "----------------------\n";
-    std::cout << "INFO: Network @ " << this << "\n"; 
+    std::cout << "INFO: Network @ " << this << "\n";
     std::cout << "Layer count: " << this->layerCount() << "\n";
-    
+
     std::cout << "Layer sizes: ";
     for (std::vector<mathutils::Vector>::iterator i = this->layers.begin(); i != this->layers.end(); ++i)
     {
         std::cout << i->size() << " ";
-    } 
+    }
     std::cout << "\n";
 
     std::cout << "Layers:\n";

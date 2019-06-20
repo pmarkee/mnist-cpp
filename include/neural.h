@@ -4,8 +4,10 @@
 #include <vector>
 
 #include "mathutils.h"
+#include "networkfile.h"
 
 class Network;
+class NetworkFile;
 
 mathutils::Vector deltaC_deltaA(Network net);
 mathutils::Matrix deltaA_deltaW(Network net, size_t depth);
@@ -27,6 +29,7 @@ class Network {
     mathutils::Vector deltaC;
     mathutils::Matrix deltaA;
 public:
+    Network(const NetworkFile& file);
     Network(const std::vector<size_t>& layerSizes,
             mathutils::activationFunction& act = mathutils::sigmoid);
 
@@ -37,20 +40,21 @@ public:
 
     ~Network();
 
-    std::vector<mathutils::Vector> getLayers();
-    std::vector<mathutils::Vector> getNonSigmoidLayers();
-    mathutils::Vector getExpected();
-    std::vector<mathutils::Matrix> getWeights();
-    std::vector<mathutils::Vector> getBiases();
-    mathutils::vectorFunction getActivationFunction();
-    mathutils::numericFunction getActivationFunctionDerivative();
-    size_t layerCount();
+    std::vector<size_t> getLayerSizes() const;
+    std::vector<mathutils::Vector> getLayers() const;
+    std::vector<mathutils::Vector> getNonSigmoidLayers() const;
+    mathutils::Vector getExpected() const;
+    std::vector<mathutils::Matrix> getWeights() const;
+    std::vector<mathutils::Vector> getBiases() const;
+    mathutils::vectorFunction getActivationFunction() const;
+    mathutils::numericFunction getActivationFunctionDerivative() const;
+    mathutils::Matrix getDeltaA() const;
+    size_t layerCount() const;
 
     void nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected);
     void computeNewValues();
     double computeCost();
     void backpropagate(size_t depth);
-    mathutils::Matrix getDeltaA();
     void finalize();
 
     void info();
