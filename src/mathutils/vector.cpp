@@ -79,7 +79,7 @@ const mathutils::Vector operator*(const mathutils::Vector& vec, const mathutils:
     return ret;
 }
 
-const mathutils::Vector operator/(const mathutils::Vector& vec, const size_t div)
+const mathutils::Vector operator/(const mathutils::Vector& vec, size_t div)
 {
     mathutils::Vector ret;
     for (int i = 0; i < vec.size(); ++i)

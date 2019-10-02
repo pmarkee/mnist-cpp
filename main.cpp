@@ -10,37 +10,37 @@
 
 int main(int argc, char const *argv[])
 {
-    imgfile* trainImages = new imgfile("data/train-images.idx3-ubyte");
-    idxfile* trainLabels = new idxfile("data/train-labels.idx1-ubyte");
+    ImgFile* train_images = new ImgFile("data/train-images.idx3-ubyte");
+    IdxFile* train_labels = new IdxFile("data/train-labels.idx1-ubyte");
 
-    assert(trainImages->itemCount() == trainLabels->itemCount());
+    assert(train_images->itemCount() == train_labels->itemCount());
 
 #ifdef DEBUG
-    //trainImages->info();
-    //trainLabels->info();
-    //trainImages->dump(0);
+    //train_images->info();
+    //train_labels->info();
+    //train_images->dump(0);
 
-    std::vector<size_t> layerSizes;
-    layerSizes.push_back(trainImages->elemSize());
-    layerSizes.push_back(10);
-    Network net(layerSizes);
+    std::vector<size_t> layer_sizes;
+    layer_sizes.push_back(train_images->elemSize());
+    layer_sizes.push_back(10);
+    Network net(layer_sizes);
 
     for (size_t i = 0; i < 10; i++)
     {
-        mathutils::Vector inputLayer;
-        for (size_t j = 0; j < trainImages->elemSize(); ++j)
+        mathutils::Vector input_layer;
+        for (size_t j = 0; j < train_images->elemSize(); ++j)
         {
-            inputLayer.push_back(trainImages->dataAt(i)[j] / 255.0);
+            input_layer.push_back(train_images->data(i)[j] / 255.0);
         }
 
-        uint8_t label = *trainLabels->dataAt(i);
+        uint8_t label = *train_labels->data(i);
         mathutils::Vector expected;
         for (size_t j = 0; j < 10; ++j)
         {
             expected.push_back(j == label ? 1.0 : 0.0);
         }
 
-        net.nextIteration(inputLayer, expected);
+        net.nextIteration(input_layer, expected);
         net.finalize();
     }
 
@@ -58,8 +58,8 @@ int main(int argc, char const *argv[])
     }
 #endif /* DEBUG */
 
-    delete trainImages;
-    delete trainLabels;
+    delete train_images;
+    delete train_labels;
 
     return 0;
 }

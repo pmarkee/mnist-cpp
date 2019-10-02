@@ -16,11 +16,12 @@ private:
     std::string path;
     std::fstream* stream;
     std::ios_base::openmode mode;
-    uint8_t layerCount;
-    std::vector<size_t> layerSizes;
-    std::vector<mathutils::Matrix> wMatrix;
-    std::vector<mathutils::Vector> bVector;
-    bool hasLoadedNet;
+
+    uint8_t layerCount_;
+    std::vector<size_t> layerSizes_;
+    std::vector<mathutils::Matrix> wMatrix_;
+    std::vector<mathutils::Vector> bVector_;
+    bool hasLoaded_;
 
     void readPadding(size_t padding_size);
     void writePadding(size_t padding_size);
@@ -32,16 +33,11 @@ public:
                 const Network& net);
     ~NetworkFile();
 
-    const uint8_t getLayerCount() const;
-    const std::vector<size_t> getLayerSizes() const;
-    const std::vector<mathutils::Matrix> getWMatrix() const;
-    const std::vector<mathutils::Vector> getBVector() const;
+    const uint8_t layerCount() const;
+    const std::vector<size_t> layerSizes() const;
+    const std::vector<mathutils::Matrix> wMatrix() const;
+    const std::vector<mathutils::Vector> bVector() const;
     bool hasLoaded() const;
-
-    void setLayerCount(size_t layerCount);
-    void setLayerSizes(const std::vector<size_t>& layerSizes);
-    void setWMatrix(const std::vector<mathutils::Matrix>& w);
-    void setBVector(const std::vector<mathutils::Vector>& b);
 
     void doRead();
     void doWrite();

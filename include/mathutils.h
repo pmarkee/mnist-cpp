@@ -11,14 +11,12 @@ namespace mathutils {
 typedef std::vector<double> Vector;
 typedef std::vector<Vector> Matrix;
 
-typedef Vector (*vectorFunction)(Vector);
-typedef double (*numericFunction)(double);
-typedef std::pair<vectorFunction, numericFunction> activationFunction;
+typedef Vector (*VectorFunction)(Vector);
+typedef double (*NumericFunction)(double);
+typedef std::pair<VectorFunction, NumericFunction> ActivationFunction;
+typedef std::pair<VectorFunction, NumericFunction> ActivationFunction;
 
-Vector vectorSigmoid(Vector z);
-double d_numericSigmoid(double d);
-
-extern activationFunction sigmoid;
+extern ActivationFunction sigmoid;
 
 inline double diffSquare(double a, double b)
 {
@@ -30,12 +28,12 @@ inline double diffSquare(double a, double b)
  */
 class MathException
 {
-    const char* msg;
+    const char* msg_;
 public:
     MathException(const char* msg);
     ~MathException();
 
-    const char* getMsg() const;
+    const char* const msg() const;
 };
 
 } /* namespace mathutils */
@@ -47,7 +45,7 @@ const mathutils::Vector operator-(const mathutils::Vector& op1, const mathutils:
 const mathutils::Vector operator*(const mathutils::Vector& vec, double mul);
 const mathutils::Vector operator*(const mathutils::Vector& op1, const mathutils::Vector& op2);
 const mathutils::Vector operator*(const mathutils::Vector& vec, const mathutils::Matrix& mat);
-const mathutils::Vector operator/(const mathutils::Vector& vec, const size_t div);
+const mathutils::Vector operator/(const mathutils::Vector& vec, size_t div);
 std::ostream& operator<<(std::ostream& os, const mathutils::Vector& vec);
 
 const mathutils::Matrix operator+(const mathutils::Matrix& op1, const mathutils::Matrix& op2);
@@ -55,7 +53,7 @@ const mathutils::Matrix operator-(const mathutils::Matrix& op1, const mathutils:
 const mathutils::Matrix schurProduct(const mathutils::Matrix& mat, const mathutils::Vector& vec);
 const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec);
 const mathutils::Matrix operator*(const mathutils::Matrix& op1, const mathutils::Matrix& op2);
-const mathutils::Matrix operator/(const mathutils::Matrix& mat, const size_t div);
+const mathutils::Matrix operator/(const mathutils::Matrix& mat, size_t div);
 std::ostream& operator<<(std::ostream& os, const mathutils::Matrix& mat);
 
 #endif /* MATHUTILS_H */

@@ -3,31 +3,31 @@
 
 #include <cstdint>
 
-class idxfile
+class IdxFile
 {
 protected:
     const char* path;
     uint8_t dataType;
     uint8_t dimension;
     uint32_t* dimSize;
-    uint8_t* data;
+    uint8_t* data_;
     size_t dataLen;
 public:
-    idxfile(const char* path);
-    ~idxfile();
+    IdxFile(const char* path);
+    ~IdxFile();
 
     uint32_t itemCount() const;
     size_t elemSize() const;
 
     void info() const;
-    uint8_t* dataAt(size_t pos) const;
+    const uint8_t* const data(size_t pos) const;
 };
 
-class imgfile : public idxfile
+class ImgFile : public IdxFile
 {
 public:
-    imgfile(const char* path);
-    ~imgfile();
+    ImgFile(const char* path);
+    ~ImgFile();
 
     void dump(size_t pos) const;
 };

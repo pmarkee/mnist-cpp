@@ -48,6 +48,7 @@ const mathutils::Matrix schurProduct(const mathutils::Matrix& mat, const mathuti
     return ret;
 }
 
+// TODO I can't recall why this is here instead of vector.cpp.
 const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec)
 {
     mathutils::Vector ret;
@@ -88,7 +89,7 @@ const mathutils::Matrix operator*(const mathutils::Matrix& op1, const mathutils:
     return ret;
 }
 
-const mathutils::Matrix operator/(const mathutils::Matrix& mat, const size_t div)
+const mathutils::Matrix operator/(const mathutils::Matrix& mat, size_t div)
 {
     mathutils::Matrix ret;
     for (int i = 0; i < mat.size(); ++i)

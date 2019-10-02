@@ -3,8 +3,8 @@
 namespace mathutils
 {
 
-MathException::MathException(const char* msg) :
-    msg(msg)
+MathException::MathException(const char* msg_)
+    : msg_(msg_)
 {
 }
 
@@ -12,9 +12,9 @@ MathException::~MathException()
 {
 }
 
-const char* MathException::getMsg() const
+const char* const MathException::msg() const
 {
-    return this->msg;
+    return this->msg_;
 }
 
 } /* namespace mathutils */

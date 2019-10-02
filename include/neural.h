@@ -9,47 +9,50 @@
 class Network;
 class NetworkFile;
 
+// NOTE: these differ from standard naming for better readability.
 mathutils::Vector deltaC_deltaA(Network net);
 mathutils::Matrix deltaA_deltaW(Network net, size_t depth);
 mathutils::Vector deltaA_deltaB(Network net, size_t depth);
 mathutils::Matrix deltaA_deltaA(Network net, size_t depth);
 
 class Network {
-    std::vector<size_t> layerSizes;
-    std::vector<mathutils::Vector> layers;
-    std::vector<mathutils::Vector> nonSigmoidLayers;
-    mathutils::Vector expected;
-    std::vector<mathutils::Matrix> weightMatrices;
-    std::vector<mathutils::Vector> biases;
-    mathutils::activationFunction act;
-    size_t iterations; // TODO actually use this
+    std::vector<size_t> layerSizes_;
+    std::vector<mathutils::Vector> layers_;
+    std::vector<mathutils::Vector> zLayers_;
+    mathutils::Vector expected_;
+    std::vector<mathutils::Matrix> weights_;
+    std::vector<mathutils::Vector> biases_;
+    mathutils::ActivationFunction act_;
+    size_t iterations;
 
     std::vector<mathutils::Matrix> deltaWeights;
     std::vector<mathutils::Vector> deltaBiases;
     mathutils::Vector deltaC;
-    mathutils::Matrix deltaA;
+    mathutils::Matrix deltaA_;
 public:
     Network(const NetworkFile& file);
-    Network(const std::vector<size_t>& layerSizes,
-            mathutils::activationFunction& act = mathutils::sigmoid);
+    Network(const std::vector<size_t>& layerSizes_,
+            mathutils::ActivationFunction& act_ = mathutils::sigmoid);
 
-    Network(const std::vector<mathutils::Matrix>& weightMatrices,
-            const std::vector<mathutils::Vector>& biases,
-            mathutils::activationFunction& act = mathutils::sigmoid,
+    Network(const std::vector<mathutils::Matrix>& weights_,
+            const std::vector<mathutils::Vector>& biases_,
+            mathutils::ActivationFunction& act_ = mathutils::sigmoid,
             const size_t iterations = 0);
 
     ~Network();
 
-    std::vector<size_t> getLayerSizes() const;
-    std::vector<mathutils::Vector> getLayers() const;
-    std::vector<mathutils::Vector> getNonSigmoidLayers() const;
-    mathutils::Vector getExpected() const;
-    std::vector<mathutils::Matrix> getWeights() const;
-    std::vector<mathutils::Vector> getBiases() const;
-    mathutils::vectorFunction getActivationFunction() const;
-    mathutils::numericFunction getActivationFunctionDerivative() const;
-    mathutils::Matrix getDeltaA() const;
+    std::vector<size_t> layerSizes() const;
+    std::vector<mathutils::Vector> layers() const;
+    std::vector<mathutils::Vector> zLayers() const;
+    mathutils::Vector expected() const;
+    std::vector<mathutils::Matrix> weights() const;
+    std::vector<mathutils::Vector> biases() const;
+    mathutils::Matrix deltaA() const;
     size_t layerCount() const;
+    // NOTE: these two getters do not just directly just return this->act_,
+    // as that is a typedef to an std::pair.
+    mathutils::VectorFunction act() const;
+    mathutils::NumericFunction d_act() const;
 
     void nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected);
     void computeNewValues();
@@ -61,13 +64,13 @@ public:
 };
 
 class NeuralException {
-    const char* msg;
+    const char* msg_;
 public:
     NeuralException();
     NeuralException(const char* msg);
     ~NeuralException();
 
-    const char* getMsg();
+    const char* msg();
 };
 
 #endif /* NEURAL_H */

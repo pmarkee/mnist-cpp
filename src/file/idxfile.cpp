@@ -4,18 +4,18 @@
 
 #include "idxfile.h"
 
-uint32_t encodeBytesAsLittleEndian(uint8_t* bytes)
+uint32_t encode_bytes_as_little_endian(uint8_t* bytes)
 {
     return bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
 }
 
-uint32_t encodeBytesAsBigEndian(uint8_t* bytes)
+uint32_t encode_bytes_as_big_endian(uint8_t* bytes)
 {
     return bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
 }
 
-idxfile::idxfile(const char* path) :
-    path(path)
+IdxFile::IdxFile(const char* path)
+    : path(path)
 {
     try {
         std::ifstream input(path, std::ios_base::binary);
@@ -24,7 +24,7 @@ idxfile::idxfile(const char* path) :
         input.seekg(2);
         this->dataType = input.get();
         this->dimension = input.get();
-        this->dimSize = new uint32_t[dimension];
+        this->dimSize = new uint32_t[this->dimension];
 
 #ifdef DEBUG
         printf("\n");
@@ -37,10 +37,10 @@ idxfile::idxfile(const char* path) :
         {
             input.read((char*)buffer, 4);
 #ifdef DEBUG
-            printf("idxfile@%p (%s): reading into dimSize[%d], bytes: ", this, this->path, i);
+            printf("IdxFile@%p (%s): reading into dimSize[%d], bytes: ", this, this->path, i);
             printf("%02x %02x %02x %02x\n", buffer[0], buffer[1], buffer[2], buffer[3]);
 #endif /* DEBUG */
-            this->dimSize[i] = encodeBytesAsBigEndian(buffer);
+            this->dimSize[i] = encode_bytes_as_big_endian(buffer);
         }
         delete[] buffer;
 
@@ -48,8 +48,8 @@ idxfile::idxfile(const char* path) :
         this->dataLen = this->itemCount() * this->elemSize();
 
         // Allocate resources and read data.
-        this->data = new uint8_t[this->dataLen];
-        input.read((char*)(this->data), this->dataLen);
+        this->data_ = new uint8_t[this->dataLen];
+        input.read((char*)(this->data_), this->dataLen);
 
         input.close();
     } catch (std::ifstream::failure& e) {
@@ -57,16 +57,16 @@ idxfile::idxfile(const char* path) :
     }
 }
 
-idxfile::~idxfile()
+IdxFile::~IdxFile()
 {
     delete this->dimSize;
-    delete[] this->data;
+    delete[] this->data_;
 }
 
 /**
  * Get the count of data items in the file.
  */
-uint32_t idxfile::itemCount() const
+uint32_t IdxFile::itemCount() const
 {
     return this->dimSize[0];
 }
@@ -74,7 +74,7 @@ uint32_t idxfile::itemCount() const
 /**
  * Get the size of each element in the file.
  */
-size_t idxfile::elemSize() const
+size_t IdxFile::elemSize() const
 {
     size_t ret = 1;
     for (int i = 1; i < this->dimension; ++i)
@@ -87,9 +87,9 @@ size_t idxfile::elemSize() const
 /**
  * Print info about the .idx file.
  */
-void idxfile::info() const
+void IdxFile::info() const
 {
-    printf("\ninfo: idxfile@%p (%s)\n", this, this->path);
+    printf("\ninfo: IdxFile@%p (%s)\n", this, this->path);
     printf("magic:\t 0 0 %d %d\n", this->dataType, this->dimension);
 
     for (int i = 0; i < this->dimension; ++i)
@@ -105,7 +105,7 @@ void idxfile::info() const
 /**
  * Get a pointer to the beginning of the data item at no. pos.
  */
-uint8_t* idxfile::dataAt(size_t pos) const
+const uint8_t* const IdxFile::data(size_t pos) const
 {
-    return this->data + pos * this->elemSize();
+    return this->data_ + pos * this->elemSize();
 }

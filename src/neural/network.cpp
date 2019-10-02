@@ -9,105 +9,105 @@
 #include "networkfile.h"
 
 Network::Network(const NetworkFile& file)
-    : layerSizes(file.getLayerSizes())
-    , weightMatrices(file.getWMatrix())
-    , biases(file.getBVector())
+    : layerSizes_(file.layerSizes())
+    , weights_(file.wMatrix())
+    , biases_(file.bVector())
 {
 }
 
-Network::Network(const std::vector<size_t>& layerSizes,
-                 mathutils::activationFunction& act)
-    : layerSizes(layerSizes)
+Network::Network(const std::vector<size_t>& layerSizes_,
+                 mathutils::ActivationFunction& act_)
+    : layerSizes_(layerSizes_)
     , iterations(0)
-    , act(act)
+    , act_(act_)
 {
-    if (this->layerSizes.size() < 2) {
+    if (this->layerSizes_.size() < 2) {
         throw NeuralException("Invalid layer count");
     }
 
     // TODO are these initializations really necessary?
 
     // Layers with random activation neurons
-    for (int i = 0; i < layerSizes.size(); ++i)
+    for (int i = 0; i < this->layerSizes_.size(); ++i)
     {
-        if ((int64_t)layerSizes[i] <= 0)
+        if ((int64_t)this->layerSizes_[i] <= 0)
         {
             // TODO give some warning here?
             // If a negative value is passed by accident, that will be a very large
             // number when handled as size_t.
         }
 
-        mathutils::Vector actLayer;
-        for (int j = 0; j < layerSizes[i]; ++j)
+        mathutils::Vector act_layer;
+        for (int j = 0; j < this->layerSizes_[i]; ++j)
         {
-            actLayer.push_back(0);
+            act_layer.push_back(0);
         }
-        this->layers.push_back(actLayer);
-        this->nonSigmoidLayers.push_back(actLayer);
+        this->layers_.push_back(act_layer);
+        this->zLayers_.push_back(act_layer);
     }
 
     std::default_random_engine generator;
-    double wLimit = -4 * (sqrt(6) / sqrt(this->layers[0].size() + this->layerCount()));
-    std::uniform_real_distribution<double> distribution(-wLimit, wLimit);
+    double w_limit = -4 * (sqrt(6) / sqrt(this->layers_[0].size() + this->layerCount()));
+    std::uniform_real_distribution<double> distribution(-w_limit, w_limit);
 
     // Random weight matrices
     for (int i = 0; i < this->layerCount() - 1; ++i)
     {
-        size_t rows = this->layerSizes[i+1];
-        size_t cols = this->layerSizes[i];
+        size_t rows = this->layerSizes_[i+1];
+        size_t cols = this->layerSizes_[i];
 
         mathutils::Matrix mat;
-        mathutils::Matrix deltaMat;
+        mathutils::Matrix delta_mat;
         for (int i = 0; i < rows; ++i)
         {
             mathutils::Vector vec;
-            mathutils::Vector deltaVec;
+            mathutils::Vector delta_vec;
             for (int j = 0; j < cols; ++j)
             {
                 // NOTE: this is only pseudo-random.
                 vec.push_back(distribution(generator));
-                deltaVec.push_back(0);
+                delta_vec.push_back(0);
             }
             mat.push_back(vec);
-            deltaMat.push_back(deltaVec);
+            delta_mat.push_back(delta_vec);
         }
 
-        this->weightMatrices.push_back(mat);
-        this->deltaWeights.push_back(deltaMat);
+        this->weights_.push_back(mat);
+        this->deltaWeights.push_back(delta_mat);
     }
 
     // Random bias vectors
     for (int i = 0; i < this->layerCount() - 1; ++i)
     {
         mathutils::Vector vec;
-        mathutils::Vector deltaVec;
-        for (int j = 0; j < this->layerSizes[i+1]; ++j)
+        mathutils::Vector delta_vec;
+        for (int j = 0; j < this->layerSizes_[i+1]; ++j)
         {
             // NOTE: this is only pseudo-random.
             vec.push_back(distribution(generator));
-            deltaVec.push_back(0);
+            delta_vec.push_back(0);
         }
-        this->biases.push_back(vec);
-        this->deltaBiases.push_back(deltaVec);
+        this->biases_.push_back(vec);
+        this->deltaBiases.push_back(delta_vec);
     }
 
-    for (size_t i = 0; i < layerSizes.back(); i++) {
-        this->expected.push_back(0);
+    for (size_t i = 0; i < this->layerSizes_.back(); i++) {
+        this->expected_.push_back(0);
     }
 }
 
-Network::Network(const std::vector<mathutils::Matrix>& weightMatrices,
-                 const std::vector<mathutils::Vector>& biases,
-                 mathutils::activationFunction& act,
+Network::Network(const std::vector<mathutils::Matrix>& weights_,
+                 const std::vector<mathutils::Vector>& biases_,
+                 mathutils::ActivationFunction& act_,
                  const size_t iterations)
-    : weightMatrices(weightMatrices)
-    , biases(biases)
-    , act(act)
+    : weights_(weights_)
+    , biases_(biases_)
+    , act_(act_)
     , iterations(iterations)
 {
-    for (std::vector<mathutils::Vector>::iterator i = layers.begin(); i != layers.end(); ++i)
+    for (std::vector<mathutils::Vector>::iterator i = this->layers_.begin(); i != this->layers_.end(); ++i)
     {
-        this->layerSizes.push_back(i->size());
+        this->layerSizes_.push_back(i->size());
     }
 }
 
@@ -115,79 +115,79 @@ Network::~Network()
 {
 }
 
-std::vector<size_t> Network::getLayerSizes() const {
-    return this->layerSizes;
+std::vector<size_t> Network::layerSizes() const {
+    return this->layerSizes_;
 }
 
-std::vector<mathutils::Vector> Network::getLayers() const {
-    return this->layers;
+std::vector<mathutils::Vector> Network::layers() const {
+    return this->layers_;
 }
 
-std::vector<mathutils::Vector> Network::getNonSigmoidLayers() const {
-    return this->nonSigmoidLayers;
+std::vector<mathutils::Vector> Network::zLayers() const {
+    return this->zLayers_;
 }
 
-mathutils::Vector Network::getExpected() const {
-    return this->expected;
+mathutils::Vector Network::expected() const {
+    return this->expected_;
 }
 
-mathutils::Matrix Network::getDeltaA() const {
-    return this->deltaA;
+mathutils::Matrix Network::deltaA() const {
+    return this->deltaA_;
 }
 
-std::vector<mathutils::Matrix> Network::getWeights() const {
-    return this->weightMatrices;
+std::vector<mathutils::Matrix> Network::weights() const {
+    return this->weights_;
 }
 
-std::vector<mathutils::Vector> Network::getBiases() const {
-    return this->biases;
+std::vector<mathutils::Vector> Network::biases() const {
+    return this->biases_;
 }
 
-mathutils::vectorFunction Network::getActivationFunction() const {
-    return this->act.first;
+mathutils::VectorFunction Network::act() const {
+    return this->act_.first;
 }
 
-mathutils::numericFunction Network::getActivationFunctionDerivative() const {
-    return this->act.second;
+mathutils::NumericFunction Network::d_act() const {
+    return this->act_.second;
 }
 
 size_t Network::layerCount() const {
-    return this->layers.size();
+    return this->layers_.size();
 }
 
 void Network::nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected)
 {
     this->iterations++;
-    if (this->expected.size() != expected.size()) {
+    if (this->expected_.size() != expected.size()) {
         throw NeuralException("Size of expected output is invalid");
     }
-    this->expected = expected;
+    this->expected_ = expected;
 
-    if (this->layerSizes[0] != inputLayer.size()) {
+    if (this->layerSizes_[0] != inputLayer.size()) {
         throw NeuralException("Invalid input layer size");
     }
-    this->layers[0] = inputLayer;
+    this->layers_[0] = inputLayer;
     this->computeNewValues();
 
     double cost = this->computeCost();
     std::cout << cost << "\n";
 
     this->deltaC = deltaC_deltaA(*this);
-    this->deltaA = deltaA_deltaA(*this, this->layerCount() - 1);
+    this->deltaA_ = deltaA_deltaA(*this, this->layerCount() - 1);
     this->backpropagate(0);
 }
 
 double Network::computeCost()
 {
-    mathutils::Vector actual = this->layers.back();
+    mathutils::Vector actual = this->layers_.back();
     // The actual and expected output layer have to be the same size.
-    if (this->expected.size() != actual.size()) {
+    if (this->expected_.size() != actual.size()) {
         throw NeuralException("Actual and expected output layer differ in length");
     }
 
     double sum = 0;
     for (size_t i = 0; i < actual.size(); ++i) {
-        sum += mathutils::diffSquare(actual[i], this->expected[i]);
+        sum += mathutils::diffSquare(actual[i], this->expected_[i]);
     }
     return sum;
 }
@@ -196,8 +196,8 @@ void Network::computeNewValues()
 {
     for (int i = 0; i < this->layerCount() - 1; ++i)
     {
-        this->nonSigmoidLayers[i + 1] = this->weightMatrices[i] * this->layers[i] - this->biases[i];
-        this->layers[i + 1] = (*this->getActivationFunction())(this->nonSigmoidLayers[i + 1]);
+        this->zLayers_[i + 1] = this->weights_[i] * this->layers_[i] - this->biases_[i];
+        this->layers_[i + 1] = (*this->act())(this->zLayers_[i + 1]);
     }
 }
 
@@ -214,9 +214,9 @@ void Network::backpropagate(size_t depth)
         this->deltaBiases[L-1] = this->deltaBiases[L-1] + deltaA_deltaB(*this, L) * this->deltaC;
 
         if (L > 1) {
-            this->deltaA = this->deltaA * deltaA_deltaA(*this, L - 1);
+            this->deltaA_ = this->deltaA_ * deltaA_deltaA(*this, L - 1);
         }
-        this->deltaC = this->deltaC * this->deltaA;
+        this->deltaC = this->deltaC * this->deltaA_;
 
         backpropagate(depth + 1);
     }
@@ -228,10 +228,10 @@ void Network::finalize()
     // Take a step in the direction of the negative gradient.
     // TODO do these by operator-=() and operator/().
     for (size_t i = 0; i < this->layerCount() - 1; i++) {
-        this->weightMatrices[i] = this->weightMatrices[i] - this->deltaWeights[i] / this->iterations;
+        this->weights_[i] = this->weights_[i] - this->deltaWeights[i] / this->iterations;
     }
     for (size_t i = 0; i < this->layerCount() - 1; i++) {
-        this->biases[i] = this->biases[i] - this->deltaBiases[i] / this->iterations;
+        this->biases_[i] = this->biases_[i] - this->deltaBiases[i] / this->iterations;
     }
     // Reset the iteration counter so we are ready for the next subset of training data.
     this->iterations = 0;
@@ -244,22 +244,22 @@ void Network::info()
     std::cout << "Layer count: " << this->layerCount() << "\n";
 
     std::cout << "Layer sizes: ";
-    for (std::vector<mathutils::Vector>::iterator i = this->layers.begin(); i != this->layers.end(); ++i)
+    for (std::vector<mathutils::Vector>::iterator i = this->layers_.begin(); i != this->layers_.end(); ++i)
     {
         std::cout << i->size() << " ";
     }
     std::cout << "\n";
 
     std::cout << "Layers:\n";
-    for(std::vector<mathutils::Vector>::iterator i = this->layers.begin(); i != this->layers.end(); ++i)
+    for(std::vector<mathutils::Vector>::iterator i = this->layers_.begin(); i != this->layers_.end(); ++i)
     {
         std::cout << *i;
         std::cout << "\n";
     }
 
     std::cout << "\nWeight matrices:\n";
-    for (std::vector<mathutils::Matrix>::iterator i = this->weightMatrices.begin();
-         i != this->weightMatrices.end();
+    for (std::vector<mathutils::Matrix>::iterator i = this->weights_.begin();
+         i != this->weights_.end();
          ++i)
     {
         std::cout << *i;
@@ -267,8 +267,8 @@ void Network::info()
     }
 
     std::cout << "Bias vectors:\n";
-    for (std::vector<mathutils::Vector>::iterator i = this->biases.begin();
-         i != this->biases.end();
+    for (std::vector<mathutils::Vector>::iterator i = this->biases_.begin();
+         i != this->biases_.end();
          ++i)
     {
         std::cout << *i;
