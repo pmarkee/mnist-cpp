@@ -5,18 +5,16 @@ SRC_DIR=src
 IMPL_DIRS=$(wildcard $(SRC_DIR)/*)
 
 CXX=g++
-CXXFLAGS=-I$(INCLUDE_DIR) -std=c++11 -lm
+CXXFLAGS=-I$(INCLUDE_DIR) -std=c++11 -lm -g -DDEBUG -Wno-format
 
-FILES=main.cpp
-FILES+=$(foreach dir,$(IMPL_DIRS),$(wildcard $(dir)/*.cpp))
+TRAINER_SOURCE=src/train.cpp
+EVALUATE_SOURCE=src/evaluate.cpp
+COMMON_FILES=$(foreach dir,$(IMPL_DIRS),$(wildcard $(dir)/*.cpp))
 
-BASE_CMD=$(CXX) $(CXXFLAGS) $(FILES)
+all: train evaluate
 
-all:
-	$(BASE_CMD) -o main
+train:
+	$(CXX) $(CXXFLAGS) $(TRAINER_SOURCE) $(COMMON_FILES) -o train
 
-debug:
-	$(BASE_CMD) -o main -g -DDEBUG
-
-print:
-	@echo $(HEADERS)
+evaluate:
+	$(CXX) $(CXXFLAGS) $(EVALUATE_SOURCE) $(COMMON_FILES) -o evaluate
