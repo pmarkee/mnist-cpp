@@ -52,7 +52,7 @@ public:
     // NOTE: these two getters do not just directly just return this->act_,
     // as that is a typedef to an std::pair.
     mathutils::VectorFunction act() const;
-    mathutils::NumericFunction d_act() const;
+    mathutils::VectorFunction d_act() const;
 
     void nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected, bool learn = true);
     void evaluate();

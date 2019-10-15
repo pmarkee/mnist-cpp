@@ -145,7 +145,7 @@ mathutils::VectorFunction Network::act() const {
     return this->act_.first;
 }
 
-mathutils::NumericFunction Network::d_act() const {
+mathutils::VectorFunction Network::d_act() const {
     return this->act_.second;
 }
 
@@ -206,7 +206,7 @@ void Network::backpropagate(size_t depth)
         // NOTE: deltas are not overwritten in every iteration, they are added up instead.
         // Later they will be averaged by using finalize().
         this->deltaWeights[L-1] = this->deltaWeights[L-1] + schurProduct(deltaA_deltaW(*this, L), this->deltaC);
-        this->deltaBiases[L-1] = this->deltaBiases[L-1] + deltaA_deltaB(*this, L) * this->deltaC;
+        this->deltaBiases[L-1] = this->deltaBiases[L-1] + schurProduct(deltaA_deltaB(*this, L), this->deltaC);
 
         this->deltaC = this->deltaC * this->prevDeltaA;
         if (L > 1) {

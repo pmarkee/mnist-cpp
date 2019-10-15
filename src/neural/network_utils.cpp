@@ -28,50 +28,26 @@ mathutils::Matrix deltaA_deltaW(Network net, size_t L)
     std::vector<mathutils::Vector> a = net.layers();
     std::vector<mathutils::Vector> z = net.zLayers();
     std::vector<mathutils::Matrix> w = net.weights();
-    mathutils::NumericFunction d_act = net.d_act();
+    mathutils::VectorFunction d_act = net.d_act();
 
-    for (int j = 0; j < w[L-1].size(); j++) {
-        mathutils::Vector vec;
-        for (int k = 0; k < w[L-1][j].size(); k++) {
-            vec.push_back(d_act(z[L][j]) * a[L-1][k]);
-        }
-        ret.push_back(vec);
-    }
-
-    return ret;
+    return d_act(z[L]) * a[L-1];
 }
 
 mathutils::Vector deltaA_deltaB(Network net, size_t L)
 {
-    mathutils::Vector ret;
-
     std::vector<mathutils::Vector> z = net.zLayers();
-    std::vector<mathutils::Vector> b = net.biases();
-    mathutils::NumericFunction d_act = net.d_act();
+    mathutils::VectorFunction d_act = net.d_act();
 
-    for (int j = 0; j < b[L-1].size(); j++) {
-        ret.push_back(d_act(z[L][j]));
-    }
-
-    return ret;
+    return d_act(z[L]);
 }
 
 mathutils::Matrix deltaA_deltaA(Network net, size_t L)
 {
     mathutils::Matrix ret;
 
-    std::vector<mathutils::Vector> a = net.layers();
     std::vector<mathutils::Vector> z = net.zLayers();
     std::vector<mathutils::Matrix> w = net.weights();
-    mathutils::NumericFunction d_act = net.d_act();
+    mathutils::VectorFunction d_act = net.d_act();
 
-    for (int j = 0; j < a[L].size(); j++) {
-        mathutils::Vector vec;
-        for (int k = 0; k < a[L-1].size(); k++) {
-            vec.push_back(d_act(z[L][j]) * w[L-1][j][k]);
-        }
-        ret.push_back(vec);
-    }
-
-    return ret;
+    return schurProduct(w[L-1], d_act(z[L]));
 }

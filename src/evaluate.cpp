@@ -20,7 +20,7 @@ int main()
     std::fstream stream("./net", mode);
     NetworkFile file(&stream, mode);
     file.doRead();
-    Network net(file);
+    Network net(file, mathutils::softmax);
     // net.info();
 
     for (size_t i = 0; i < 1; i++)

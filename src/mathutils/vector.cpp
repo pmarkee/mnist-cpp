@@ -45,9 +45,8 @@ const mathutils::Vector operator*(const mathutils::Vector& vec, double mul)
     return ret;
 }
 
-const mathutils::Vector operator*(const mathutils::Vector& op1, const mathutils::Vector& op2)
+const mathutils::Vector schurProduct(const mathutils::Vector& op1, const mathutils::Vector& op2)
 {
-    // NOTE: this is HADAMARD product!
     if (op1.size() != op2.size()) {
         throw mathutils::MathException("Invalid size of operands");
     }
@@ -56,6 +55,25 @@ const mathutils::Vector operator*(const mathutils::Vector& op1, const mathutils:
     for (int i = 0; i < op1.size(); ++i)
     {
         ret.push_back(op1[i] * op2[i]);
+    }
+
+    return ret;
+}
+
+const mathutils::Matrix operator*(const mathutils::Vector& op1, const mathutils::Vector& op2)
+{
+    // NOTE: there is a very strong assumption here that these are n x 1 and 1 x m vectors.
+    // Basically we are taking the transpose of op2.
+    mathutils::Matrix ret;
+
+    for (int i = 0; i < op1.size(); i++)
+    {
+        mathutils::Vector vec;
+        for (int j = 0; j < op2.size(); j++)
+        {
+            vec.push_back(op1[i] * op2[j]);
+        }
+        ret.push_back(vec);
     }
 
     return ret;

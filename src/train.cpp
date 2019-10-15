@@ -22,7 +22,7 @@ int main()
     layer_sizes.push_back(train_images.elemSize());
     layer_sizes.push_back(35);
     layer_sizes.push_back(10);
-    Network net(layer_sizes);
+    Network net(layer_sizes, mathutils::softmax);
 
     size_t batch_size = 100;
     assert(item_count >= batch_size);
