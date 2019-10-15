@@ -71,9 +71,11 @@ const mathutils::Vector operator*(const mathutils::Vector& vec, const mathutils:
 
     for (int i = 0; i < mat[0].size(); ++i)
     {
+        double sum = 0;
         for (int j = 0; j < vec.size(); ++j) {
-            ret.push_back(vec[j] * mat[j][i]);
+            sum += vec[j] * mat[j][i];
         }
+        ret.push_back(sum);
     }
 
     return ret;

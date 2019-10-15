@@ -48,6 +48,21 @@ const mathutils::Matrix schurProduct(const mathutils::Matrix& mat, const mathuti
     return ret;
 }
 
+const mathutils::Matrix operator*(const mathutils::Matrix& mat, double mul)
+{
+    mathutils::Matrix ret;
+    for (int i = 0; i < mat.size(); i++)
+    {
+        mathutils::Vector vec;
+        for (int j = 0; j < mat[i].size(); j++)
+        {
+            vec.push_back(mat[i][j] * mul);
+        }
+        ret.push_back(vec);
+    }
+    return ret;
+}
+
 // TODO I can't recall why this is here instead of vector.cpp.
 const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec)
 {

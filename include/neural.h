@@ -29,20 +29,20 @@ class Network {
     std::vector<mathutils::Vector> deltaBiases;
     mathutils::Vector deltaC;
     mathutils::Matrix deltaA_;
+    mathutils::Matrix prevDeltaA;
 public:
-    Network(const NetworkFile& file);
+    Network(const NetworkFile& file,
+            mathutils::ActivationFunction& act_ = mathutils::sigmoid);
     Network(const std::vector<size_t>& layerSizes_,
             mathutils::ActivationFunction& act_ = mathutils::sigmoid);
 
-    Network(const std::vector<mathutils::Matrix>& weights_,
-            const std::vector<mathutils::Vector>& biases_,
-            mathutils::ActivationFunction& act_ = mathutils::sigmoid,
-            const size_t iterations = 0);
-
     ~Network();
+
+    void init();
 
     std::vector<size_t> layerSizes() const;
     std::vector<mathutils::Vector> layers() const;
+    mathutils::Vector outputLayer() const;
     std::vector<mathutils::Vector> zLayers() const;
     mathutils::Vector expected() const;
     std::vector<mathutils::Matrix> weights() const;
@@ -54,9 +54,9 @@ public:
     mathutils::VectorFunction act() const;
     mathutils::NumericFunction d_act() const;
 
-    void nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected);
-    void computeNewValues();
-    double computeCost();
+    void nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected, bool learn = true);
+    void evaluate();
+    double loss();
     void backpropagate(size_t depth);
     void finalize();
 

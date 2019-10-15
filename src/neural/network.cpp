@@ -8,11 +8,15 @@
 #include "neural.h"
 #include "networkfile.h"
 
-Network::Network(const NetworkFile& file)
+// TODO activation function should somehow be saved into the network file to be loaded here automatically.
+Network::Network(const NetworkFile& file,
+                 mathutils::ActivationFunction& act_)
     : layerSizes_(file.layerSizes())
     , weights_(file.wMatrix())
     , biases_(file.bVector())
+    , act_(act_)
 {
+    init();
 }
 
 Network::Network(const std::vector<size_t>& layerSizes_,
@@ -20,6 +24,15 @@ Network::Network(const std::vector<size_t>& layerSizes_,
     : layerSizes_(layerSizes_)
     , iterations(0)
     , act_(act_)
+{
+    init();
+}
+
+Network::~Network()
+{
+}
+
+void Network::init()
 {
     if (this->layerSizes_.size() < 2) {
         throw NeuralException("Invalid layer count");
@@ -96,31 +109,16 @@ Network::Network(const std::vector<size_t>& layerSizes_,
     }
 }
 
-Network::Network(const std::vector<mathutils::Matrix>& weights_,
-                 const std::vector<mathutils::Vector>& biases_,
-                 mathutils::ActivationFunction& act_,
-                 const size_t iterations)
-    : weights_(weights_)
-    , biases_(biases_)
-    , act_(act_)
-    , iterations(iterations)
-{
-    for (std::vector<mathutils::Vector>::iterator i = this->layers_.begin(); i != this->layers_.end(); ++i)
-    {
-        this->layerSizes_.push_back(i->size());
-    }
-}
-
-Network::~Network()
-{
-}
-
 std::vector<size_t> Network::layerSizes() const {
     return this->layerSizes_;
 }
 
 std::vector<mathutils::Vector> Network::layers() const {
     return this->layers_;
+}
+
+mathutils::Vector Network::outputLayer() const {
+    return this->layers_.back();
 }
 
 std::vector<mathutils::Vector> Network::zLayers() const {
@@ -155,29 +153,26 @@ size_t Network::layerCount() const {
     return this->layers_.size();
 }
 
-void Network::nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected)
+void Network::nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected, bool learn)
 {
     this->iterations++;
-    if (this->expected_.size() != expected.size()) {
-        throw NeuralException("Size of expected output is invalid");
-    }
     this->expected_ = expected;
 
     if (this->layerSizes_[0] != inputLayer.size()) {
         throw NeuralException("Invalid input layer size");
     }
     this->layers_[0] = inputLayer;
-    this->computeNewValues();
+    this->evaluate();
 
-    double cost = this->computeCost();
-    std::cout << cost << "\n";
-
-    this->deltaC = deltaC_deltaA(*this);
-    this->deltaA_ = deltaA_deltaA(*this, this->layerCount() - 1);
-    this->backpropagate(0);
+    if (learn)
+    {
+        this->deltaC = deltaC_deltaA(*this);
+        this->deltaA_ = this->prevDeltaA = deltaA_deltaA(*this, this->layerCount() - 1);
+        this->backpropagate(0);
+    }
 }
 
-double Network::computeCost()
+double Network::loss()
 {
     mathutils::Vector actual = this->layers_.back();
     // The actual and expected output layer have to be the same size.
@@ -189,14 +184,14 @@ double Network::computeCost()
     for (size_t i = 0; i < actual.size(); ++i) {
         sum += mathutils::diffSquare(actual[i], this->expected_[i]);
     }
-    return sum;
+    return sum / actual.size();
 }
 
-void Network::computeNewValues()
+void Network::evaluate()
 {
     for (int i = 0; i < this->layerCount() - 1; ++i)
     {
-        this->zLayers_[i + 1] = this->weights_[i] * this->layers_[i] - this->biases_[i];
+        this->zLayers_[i + 1] = this->weights_[i] * this->layers_[i] + this->biases_[i];
         this->layers_[i + 1] = (*this->act())(this->zLayers_[i + 1]);
     }
 }
@@ -213,10 +208,11 @@ void Network::backpropagate(size_t depth)
         this->deltaWeights[L-1] = this->deltaWeights[L-1] + schurProduct(deltaA_deltaW(*this, L), this->deltaC);
         this->deltaBiases[L-1] = this->deltaBiases[L-1] + deltaA_deltaB(*this, L) * this->deltaC;
 
+        this->deltaC = this->deltaC * this->prevDeltaA;
         if (L > 1) {
-            this->deltaA_ = this->deltaA_ * deltaA_deltaA(*this, L - 1);
+            this->prevDeltaA = deltaA_deltaA(*this, L - 1);
+            this->deltaA_ = this->deltaA_ * this->prevDeltaA;
         }
-        this->deltaC = this->deltaC * this->deltaA_;
 
         backpropagate(depth + 1);
     }
