@@ -1,3 +1,6 @@
 main
 data/
 net
+train
+evaluate
+*sublime*
