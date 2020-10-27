@@ -45,6 +45,16 @@ const mathutils::Vector operator*(const mathutils::Vector& vec, double mul)
     return ret;
 }
 
+// const mathutils::Vector operator*(const mathutils::Vector& vec, int mul)
+// {
+//     mathutils::Vector ret;
+//     // Multiply all elements of the vector.
+//     for (int i = 0; i < vec.size(); i++) {
+//         ret.push_back(vec[i] *  mul);
+//     }
+//     return ret;
+// }
+
 const mathutils::Vector schurProduct(const mathutils::Vector& op1, const mathutils::Vector& op2)
 {
     if (op1.size() != op2.size()) {

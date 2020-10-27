@@ -129,10 +129,6 @@ mathutils::Vector Network::expected() const {
     return this->expected_;
 }
 
-mathutils::Matrix Network::deltaA() const {
-    return this->deltaA_;
-}
-
 std::vector<mathutils::Matrix> Network::weights() const {
     return this->weights_;
 }
@@ -166,8 +162,8 @@ void Network::nextIteration(const mathutils::Vector& inputLayer, const mathutils
 
     if (learn)
     {
-        this->deltaC = deltaC_deltaA(*this);
-        this->deltaA_ = this->prevDeltaA = deltaA_deltaA(*this, this->layerCount() - 1);
+        this->deltaC = deltaC_deltaZ(*this);
+        this->deltaZ_ = this->prevDeltaZ = deltaZ_deltaZ(*this, this->layerCount() - 1);
         this->backpropagate(0);
     }
 }
@@ -205,13 +201,13 @@ void Network::backpropagate(size_t depth)
         // (i.e. necessary changes to the weight and bias values of the network)
         // NOTE: deltas are not overwritten in every iteration, they are added up instead.
         // Later they will be averaged by using finalize().
-        this->deltaWeights[L-1] = this->deltaWeights[L-1] + schurProduct(deltaA_deltaW(*this, L), this->deltaC);
-        this->deltaBiases[L-1] = this->deltaBiases[L-1] + schurProduct(deltaA_deltaB(*this, L), this->deltaC);
+        this->deltaWeights[L-1] = this->deltaWeights[L-1] + this->deltaC * deltaZ_deltaW(*this, L);
+        this->deltaBiases[L-1] = this->deltaBiases[L-1] + schurProduct(this->deltaC, deltaZ_deltaB(*this, L));
 
-        this->deltaC = this->deltaC * this->prevDeltaA;
+        this->deltaC = this->deltaC * this->prevDeltaZ;
         if (L > 1) {
-            this->prevDeltaA = deltaA_deltaA(*this, L - 1);
-            this->deltaA_ = this->deltaA_ * this->prevDeltaA;
+            this->prevDeltaZ = deltaZ_deltaZ(*this, L - 1);
+            this->deltaZ_ = this->deltaZ_ * this->prevDeltaZ;
         }
 
         backpropagate(depth + 1);

@@ -32,6 +32,10 @@ const mathutils::Matrix operator-(const mathutils::Matrix& op1, const mathutils:
     return ret;
 }
 
+// NOTE: this is not a real Schur product,
+// this basically just multiplies every line
+// of a matrix with the corresponding index
+// of a vector
 const mathutils::Matrix schurProduct(const mathutils::Matrix& mat, const mathutils::Vector& vec)
 {
     mathutils::Matrix ret;
@@ -45,6 +49,27 @@ const mathutils::Matrix schurProduct(const mathutils::Matrix& mat, const mathuti
         ret.push_back(mat[i] * vec[i]);
     }
 
+    return ret;
+}
+
+// This one is the real Schur product
+const mathutils::Matrix schurProduct(const mathutils::Matrix& op1, const mathutils::Matrix& op2)
+{
+    mathutils::Matrix ret;
+    if (op1.size() != op2.size() || op1[0].size() != op2[0].size())
+    {
+        throw mathutils::MathException("Invalid size of operands");
+    }
+
+    for (int i = 0; i < op1.size(); i++)
+    {
+        mathutils::Vector vec;
+        for (int j = 0; j < op1[0].size(); j++)
+        {
+            vec.push_back(op1[i][j] * op2[i][j]);
+        }
+        ret.push_back(vec);
+    }
     return ret;
 }
 
@@ -111,6 +136,23 @@ const mathutils::Matrix operator/(const mathutils::Matrix& mat, size_t div)
     {
         ret.push_back(mat[i] / div);
     }
+    return ret;
+}
+
+const mathutils::Matrix transpose(const mathutils::Matrix& op)
+{
+    mathutils::Matrix ret;
+
+    for (int j = 0; j < op[0].size(); j++)
+    {
+        mathutils::Vector vec;
+        for (int i = 0; i < op.size(); i++)
+        {
+            vec.push_back(op[i][j]);
+        }
+        ret.push_back(vec);
+    }
+
     return ret;
 }
 

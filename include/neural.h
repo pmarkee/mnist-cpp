@@ -10,10 +10,10 @@ class Network;
 class NetworkFile;
 
 // NOTE: these differ from standard naming for better readability.
-mathutils::Vector deltaC_deltaA(Network net);
-mathutils::Matrix deltaA_deltaW(Network net, size_t depth);
-mathutils::Vector deltaA_deltaB(Network net, size_t depth);
-mathutils::Matrix deltaA_deltaA(Network net, size_t depth);
+mathutils::Vector deltaC_deltaZ(Network net);
+mathutils::Vector deltaZ_deltaW(Network net, size_t depth);
+mathutils::Vector deltaZ_deltaB(Network net, size_t depth);
+mathutils::Matrix deltaZ_deltaZ(Network net, size_t depth);
 
 class Network {
     std::vector<size_t> layerSizes_;
@@ -28,8 +28,8 @@ class Network {
     std::vector<mathutils::Matrix> deltaWeights;
     std::vector<mathutils::Vector> deltaBiases;
     mathutils::Vector deltaC;
-    mathutils::Matrix deltaA_;
-    mathutils::Matrix prevDeltaA;
+    mathutils::Matrix deltaZ_;
+    mathutils::Matrix prevDeltaZ;
 public:
     Network(const NetworkFile& file,
             mathutils::ActivationFunction& act_ = mathutils::sigmoid);
@@ -47,7 +47,7 @@ public:
     mathutils::Vector expected() const;
     std::vector<mathutils::Matrix> weights() const;
     std::vector<mathutils::Vector> biases() const;
-    mathutils::Matrix deltaA() const;
+    mathutils::Matrix deltaZ() const;
     size_t layerCount() const;
     // NOTE: these two getters do not just directly just return this->act_,
     // as that is a typedef to an std::pair.

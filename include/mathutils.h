@@ -42,6 +42,7 @@ const mathutils::Vector operator+(const mathutils::Vector& op1, const mathutils:
 const mathutils::Vector operator-(const mathutils::Vector& vec);
 const mathutils::Vector operator-(const mathutils::Vector& op1, const mathutils::Vector& op2);
 const mathutils::Vector operator*(const mathutils::Vector& vec, double mul);
+// const mathutils::Vector operator*(const mathutils::Vector& vec, int mul);
 const mathutils::Vector schurProduct(const mathutils::Vector& op1, const mathutils::Vector& op2);
 const mathutils::Matrix operator*(const mathutils::Vector& op1, const mathutils::Vector& op2);
 const mathutils::Vector operator*(const mathutils::Vector& vec, const mathutils::Matrix& mat);
@@ -51,10 +52,12 @@ std::ostream& operator<<(std::ostream& os, const mathutils::Vector& vec);
 const mathutils::Matrix operator+(const mathutils::Matrix& op1, const mathutils::Matrix& op2);
 const mathutils::Matrix operator-(const mathutils::Matrix& op1, const mathutils::Matrix& op2);
 const mathutils::Matrix schurProduct(const mathutils::Matrix& mat, const mathutils::Vector& vec);
+const mathutils::Matrix schurProduct(const mathutils::Matrix& op1, const mathutils::Matrix& op2);
 const mathutils::Matrix operator*(const mathutils::Matrix& mat, double mul);
 const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec);
 const mathutils::Matrix operator*(const mathutils::Matrix& op1, const mathutils::Matrix& op2);
 const mathutils::Matrix operator/(const mathutils::Matrix& mat, size_t div);
+const mathutils::Matrix transpose(const mathutils::Matrix& op);
 std::ostream& operator<<(std::ostream& os, const mathutils::Matrix& mat);
 
 #endif /* MATHUTILS_H */
