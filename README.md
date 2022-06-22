@@ -2,6 +2,7 @@
 
 ## Usage
 
+0. get the mnist training and testing data [here](http://yann.lecun.com/exdb/mnist/) and extract it into a directory named `data/`
 1. make any changes you would like to the meta parameters of the network in the source code.
 2.
 ```sh
