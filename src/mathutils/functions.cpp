@@ -40,7 +40,6 @@ Vector vector_softmax(Vector z)
     Vector ret;
     size_t K = z.size();
 
-    // When z values are big, sum becomes infinity, and ret thus has a bunch of 0 and nan values.
     double sum = 0;
     for (size_t i = 0; i < K; i++)
     {

@@ -23,8 +23,11 @@ int main()
     Network net(file, mathutils::softmax);
     // net.info();
 
-    for (size_t i = 0; i < 1; i++)
+    double loss_sum = 0.0;
+    size_t correct = 0;
+    for (size_t i = 0; i < item_count; i++)
     {
+        // test_images.dump(i);
         mathutils::Vector input_layer;
         for (size_t j = 0; j < test_images.elemSize(); ++j)
         {
@@ -38,12 +41,22 @@ int main()
             expected.push_back(j == label ? 1.0 : 0.0);
         }
 
-        net.nextIteration(input_layer, expected);
+        mathutils::Vector output = net.predict(input_layer);
+        size_t prediction = vector_argmax(output);
+        if (prediction == (size_t) label) {
+            correct++;
+        }
 
-        mathutils::Vector output = net.outputLayer();
-        std::cout << expected;
-        std::cout << output;
+        // std::cout << "prediction: " << prediction << "\n";
+        // std::cout << "label: " << (size_t) label << "\n";
+
+        loss_sum += net.loss();
     }
+
+    // std::cout << "item count: " << item_count << "\n";
+    // std::cout << "correct: " << correct << "\n";
+    std::cout << "accuracy: " << 1.0 * correct / item_count << "\n";
+    // std::cout << "average loss: " << loss_sum / item_count << "\n";
 
     return 0;
 }

@@ -17,6 +17,11 @@ typedef std::pair<VectorFunction, VectorFunction> ActivationFunction;
 extern ActivationFunction sigmoid;
 extern ActivationFunction softmax;
 
+extern Vector vector_sigmoid(Vector z);
+extern Vector d_vector_sigmoid(Vector z);
+extern Vector vector_softmax(Vector z);
+extern Vector d_vector_softmax(Vector z);
+
 inline double diffSquare(double a, double b)
 {
     return pow(a - b, 2);
@@ -37,7 +42,6 @@ public:
 
 } /* namespace mathutils */
 
-// TODO some of these operator functions could maybe use the other ones, investigate this.
 const mathutils::Vector operator+(const mathutils::Vector& op1, const mathutils::Vector& op2);
 const mathutils::Vector operator-(const mathutils::Vector& vec);
 const mathutils::Vector operator-(const mathutils::Vector& op1, const mathutils::Vector& op2);
@@ -48,6 +52,7 @@ const mathutils::Matrix operator*(const mathutils::Vector& op1, const mathutils:
 const mathutils::Vector operator*(const mathutils::Vector& vec, const mathutils::Matrix& mat);
 const mathutils::Vector operator/(const mathutils::Vector& vec, size_t div);
 std::ostream& operator<<(std::ostream& os, const mathutils::Vector& vec);
+size_t vector_argmax(const mathutils::Vector& vec);
 
 const mathutils::Matrix operator+(const mathutils::Matrix& op1, const mathutils::Matrix& op2);
 const mathutils::Matrix operator-(const mathutils::Matrix& op1, const mathutils::Matrix& op2);

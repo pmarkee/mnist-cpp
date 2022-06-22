@@ -8,7 +8,6 @@
 #include "neural.h"
 #include "networkfile.h"
 
-// TODO activation function should somehow be saved into the network file to be loaded here automatically.
 Network::Network(const NetworkFile& file,
                  mathutils::ActivationFunction& act_)
     : layerSizes_(file.layerSizes())
@@ -38,18 +37,8 @@ void Network::init()
         throw NeuralException("Invalid layer count");
     }
 
-    // TODO are these initializations really necessary?
-
-    // Layers with random activation neurons
     for (int i = 0; i < this->layerSizes_.size(); ++i)
     {
-        if ((int64_t)this->layerSizes_[i] <= 0)
-        {
-            // TODO give some warning here?
-            // If a negative value is passed by accident, that will be a very large
-            // number when handled as size_t.
-        }
-
         mathutils::Vector act_layer;
         for (int j = 0; j < this->layerSizes_[i]; ++j)
         {
@@ -77,7 +66,6 @@ void Network::init()
             mathutils::Vector delta_vec;
             for (int j = 0; j < cols; ++j)
             {
-                // NOTE: this is only pseudo-random.
                 vec.push_back(distribution(generator));
                 delta_vec.push_back(0);
             }
@@ -96,7 +84,6 @@ void Network::init()
         mathutils::Vector delta_vec;
         for (int j = 0; j < this->layerSizes_[i+1]; ++j)
         {
-            // NOTE: this is only pseudo-random.
             vec.push_back(distribution(generator));
             delta_vec.push_back(0);
         }
@@ -158,7 +145,7 @@ void Network::nextIteration(const mathutils::Vector& inputLayer, const mathutils
         throw NeuralException("Invalid input layer size");
     }
     this->layers_[0] = inputLayer;
-    this->evaluate();
+    this->feedforward();
 
     if (learn)
     {
@@ -183,13 +170,22 @@ double Network::loss()
     return sum / actual.size();
 }
 
-void Network::evaluate()
+void Network::feedforward()
 {
     for (int i = 0; i < this->layerCount() - 1; ++i)
     {
         this->zLayers_[i + 1] = this->weights_[i] * this->layers_[i] + this->biases_[i];
-        this->layers_[i + 1] = (*this->act())(this->zLayers_[i + 1]);
+        this->layers_[i + 1] = mathutils::vector_sigmoid(this->zLayers_[i + 1]);
     }
+}
+
+const mathutils::Vector Network::predict(const mathutils::Vector& image) {
+    this->layers_[0] = image;
+    this->feedforward();
+
+    // mathutils::Vector finalOutput = mathutils::vector_softmax(this->layers_.back());
+    mathutils::Vector finalOutput = this->layers_.back();
+    return finalOutput;
 }
 
 void Network::backpropagate(size_t depth)
@@ -218,13 +214,35 @@ void Network::finalize()
 {
     // Average the deltas over all the training examples that have been run.
     // Take a step in the direction of the negative gradient.
-    // TODO do these by operator-=() and operator/().
     for (size_t i = 0; i < this->layerCount() - 1; i++) {
         this->weights_[i] = this->weights_[i] - this->deltaWeights[i] / this->iterations;
     }
     for (size_t i = 0; i < this->layerCount() - 1; i++) {
         this->biases_[i] = this->biases_[i] - this->deltaBiases[i] / this->iterations;
     }
+
+    for (int i = 0; i < this->layerCount() - 1; ++i)
+    {
+        size_t rows = this->layerSizes_[i+1];
+        size_t cols = this->layerSizes_[i];
+        for (int j = 0; j < rows; ++j)
+        {
+            for (int k = 0; k < cols; ++k)
+            {
+                this->deltaWeights[i][j][k] = 0;
+            }
+        }
+    }
+
+    for (int i = 0; i < this->layerCount() - 1; ++i)
+    {
+        size_t rows = this->layerSizes_[i+1];
+        for (int j = 0; j < rows; ++j)
+        {
+            this->deltaBiases[i][j] = 0;
+        }
+    }
+
     // Reset the iteration counter so we are ready for the next subset of training data.
     this->iterations = 0;
 }

@@ -6,7 +6,6 @@
 #include <fstream>
 #include <vector>
 
-// TODO auto-create new filename based on datetime
 NetworkFile::NetworkFile(std::fstream* const stream, const std::ios_base::openmode& mode)
     : stream(stream)
     , mode(mode)
@@ -72,7 +71,6 @@ void NetworkFile::doRead()
     }
 
     // Erase all loaded data.
-    // TODO is this necessary with the above if block in place?
     this->layerSizes_.clear();
     this->wMatrix_.clear();
     this->bVector_.clear();

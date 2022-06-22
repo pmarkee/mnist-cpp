@@ -7,11 +7,11 @@
 mathutils::Vector deltaC_deltaZ(Network net) {
     size_t L = net.layerCount() - 1;
     std::vector<mathutils::Vector> a = net.layers();
-    std::vector<mathutils::Vector> z = net.zLayers();
+    // std::vector<mathutils::Vector> z = net.zLayers();
     mathutils::VectorFunction d_act = net.d_act();
     mathutils::Vector y = net.expected();
 
-    return schurProduct((a[L] - y) * 2, d_act(z[L]));
+    return schurProduct((a[L] - y) * 2, mathutils::d_vector_sigmoid(a[L]));
 }
 
 mathutils::Vector deltaZ_deltaW(Network net, size_t L)
@@ -43,5 +43,5 @@ mathutils::Matrix deltaZ_deltaZ(Network net, size_t L)
     std::vector<mathutils::Matrix> w = net.weights();
     mathutils::VectorFunction d_act = net.d_act();
 
-    return transpose(schurProduct(transpose(w[L-1]), d_act(z[L-1])));
+    return transpose(schurProduct(transpose(w[L-1]), mathutils::d_vector_sigmoid(z[L-1])));
 }

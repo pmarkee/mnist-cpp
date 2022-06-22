@@ -128,3 +128,15 @@ std::ostream& operator<<(std::ostream& os, const mathutils::Vector& vec)
     os << "\n";
     return os;
 }
+
+size_t vector_argmax(const mathutils::Vector& vec) {
+	double max_score = 0;
+	uint8_t max_idx = 0;
+    for (uint8_t i = 0; i < vec.size(); i++) {
+        if (vec[i] > max_score) {
+            max_score = vec[i];
+            max_idx = i;
+        }
+    }
+    return max_idx;
+}

@@ -55,7 +55,8 @@ public:
     mathutils::VectorFunction d_act() const;
 
     void nextIteration(const mathutils::Vector& inputLayer, const mathutils::Vector& expected, bool learn = true);
-    void evaluate();
+    void feedforward();
+    const mathutils::Vector predict(const mathutils::Vector& image);
     double loss();
     void backpropagate(size_t depth);
     void finalize();

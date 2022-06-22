@@ -88,7 +88,6 @@ const mathutils::Matrix operator*(const mathutils::Matrix& mat, double mul)
     return ret;
 }
 
-// TODO I can't recall why this is here instead of vector.cpp.
 const mathutils::Vector operator*(const mathutils::Matrix& mat, const mathutils::Vector& vec)
 {
     mathutils::Vector ret;
